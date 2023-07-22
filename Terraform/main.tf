@@ -39,13 +39,6 @@ terraform {
 
 provider "azurerm" {
   features {}
-  default_tags {
-    tags = {
-      ENV       = var.environment
-      project = var.project
-      created = "terraform"
-    }
-  }
 }
 
 provider "azuread" {
@@ -72,6 +65,12 @@ resource "random_string" "suffix" {
 resource "azurerm_resource_group" "resource-group" {
   name     = var.resource_group_name
   location = var.azure_region
+
+  tags = {
+    ENV     = var.environment
+    project = var.project
+    created = "terraform"
+  }
 }
 
 /************************************************************************************************************************************************
@@ -79,11 +78,16 @@ resource "azurerm_resource_group" "resource-group" {
         All of the Event Hubs will be created in this Namespace.
 ************************************************************************************************************************************************/
 resource "azurerm_eventhub_namespace" "eventhub-namespace" {
-  name                = "eventhub-poc"
+  name                = "eventhub-da-poc"
   location            = azurerm_resource_group.resource-group.location
   resource_group_name = azurerm_resource_group.resource-group.name
   sku                 = "Basic"
   capacity            = 2
+  tags = {
+    ENV     = var.environment
+    project = var.project
+    created = "terraform"
+  }
 }
 
 /************************************************************************************************************************************************
