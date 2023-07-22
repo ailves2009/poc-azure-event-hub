@@ -8,7 +8,6 @@
 ************************************************************************************************************************************************/
 
 azure_region        = "westeurope"       // Region to create all the resources in.
-resource_group_name = "event-hub-poc-rg" // Resource Group for all related Azure services.
 environment         = "PoC"              // Proof of Concept environment
 project             = "Azure Event Hub"  // "Azure Event Hub PoC"
 /*

@@ -63,7 +63,7 @@ resource "random_string" "suffix" {
 //   Azure: https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-portal
 //   Terraform: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group
 resource "azurerm_resource_group" "resource-group" {
-  name     = var.resource_group_name
+  name     = "eventhub-rg-poc"
   location = var.azure_region
 
   tags = {
@@ -78,7 +78,7 @@ resource "azurerm_resource_group" "resource-group" {
         All of the Event Hubs will be created in this Namespace.
 ************************************************************************************************************************************************/
 resource "azurerm_eventhub_namespace" "eventhub-namespace" {
-  name                = "eventhub-da-poc"
+  name                = "eventhub-ns-da-poc"
   location            = azurerm_resource_group.resource-group.location
   resource_group_name = azurerm_resource_group.resource-group.name
   sku                 = "Basic"
@@ -95,7 +95,7 @@ resource "azurerm_eventhub_namespace" "eventhub-namespace" {
         All of the Event Hubs will be created in this Namespace.
 ************************************************************************************************************************************************/
 resource "azurerm_eventhub" "eventhub-poc1" {
-  name                = "eventhub-poc1"
+  name                = "eventhub1-poc"
   namespace_name      = azurerm_eventhub_namespace.eventhub-namespace.name
   resource_group_name = azurerm_resource_group.resource-group.name
   partition_count     = 2
