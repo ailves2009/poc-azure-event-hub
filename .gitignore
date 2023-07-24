@@ -8,7 +8,6 @@ cfn/
 *.code-workspace
 
 # Python files
-*.py
 **/locals/*
 
 # Local .terraform directories
