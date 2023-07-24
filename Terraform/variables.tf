@@ -10,10 +10,6 @@ variable "azure_region" {
   description = "Region to create all the resources in."
 }
 
-variable "resource_group_name" {
-  description = "Resource Group for all related Azure services."
-}
-
 variable "environment" {
   description = "Environment can be PoC, test, stage, prod"
 }

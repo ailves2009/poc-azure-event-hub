@@ -91,8 +91,8 @@ resource "azurerm_eventhub_namespace" "eventhub-namespace" {
 }
 
 /************************************************************************************************************************************************
-  Resource Group Namespace
-        All of the Event Hubs will be created in this Namespace.
+  Resource Event Hub
+        Event Hub 1
 ************************************************************************************************************************************************/
 resource "azurerm_eventhub" "eventhub-poc1" {
   name                = "eventhub1-poc"
@@ -100,4 +100,18 @@ resource "azurerm_eventhub" "eventhub-poc1" {
   resource_group_name = azurerm_resource_group.resource-group.name
   partition_count     = 2
   message_retention   = 1
+}
+
+/************************************************************************************************************************************************
+  Resource Access Policy
+        Shared Access Policy to access to Event Hub
+************************************************************************************************************************************************/
+resource "azurerm_eventhub_authorization_rule" "eventhub_authorization_rule" {
+  name                = "eventhub-poc-policy"
+  namespace_name      = azurerm_eventhub_namespace.eventhub-namespace.name
+  eventhub_name       = azurerm_eventhub.eventhub-poc1.name
+  resource_group_name = azurerm_resource_group.resource-group.name
+  listen              = true
+  send                = true
+  manage              = false
 }
