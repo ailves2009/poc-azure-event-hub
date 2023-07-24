@@ -9,6 +9,6 @@
 
 azure_region        = "westeurope"       // Region to create all the resources in.
 environment         = "PoC"              // Proof of Concept environment
-project             = "Azure Event Hub"  // "Azure Event Hub PoC"
+project             = "Azure Event Hub"  // Azure Event Hub PoC
 partition_count     = 2                  // Number of partitions in Event Hub
 message_retention   = 1                  // retention period for store massages in Event Hub
