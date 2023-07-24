@@ -13,6 +13,7 @@ The following commands should be executed from the Azure Cloud Shell at https://
 ```
 @Azure:~$ git clone https://github.com/iag2009/Azure-Event-Hub-PoC
 @Azure:~$ cd Azure-Event-Hub-PoC
+@Azure:~$ az login
 @Azure:~$ bash deployEventHub.sh
 ```
 
@@ -22,9 +23,7 @@ You can manually configure the Terraform parameters and update default settings 
 @Azure:~$ git clone https://github.com/iag2009/Azure-Event-Hub-PoC
 @Azure:~$ cd Azure-Event-Hub-PoC
 @Azure:~$ code Terraform/terraform.tfvars
-@Azure:~$ terraform -chdir=Terraform init
-@Azure:~$ terraform -chdir=Terraform plan
-@Azure:~$ terraform -chdir=Terraform apply
+@Azure:~$ az login
 @Azure:~$ bash deployEventHub.sh 
 ```
 
