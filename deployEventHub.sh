@@ -11,6 +11,10 @@
 #
 #       @Azure:~/Azure-Event-Hub-PoC/$ bash deployEventHub.sh
 #
+#   To destroy resources 
+#       @Azure: cd Terraform
+#       @Azure: terraform destroy
+#
 # Todo:
 #    - Bicep deployment
 
