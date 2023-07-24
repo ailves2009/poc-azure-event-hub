@@ -7,8 +7,8 @@ cfn/
 *.csv
 *.code-workspace
 
-# AWS Lambda Function creates BUILD dir
-builds
+# Python files
+*.py
 
 # Local .terraform directories
 **/.terraform/*

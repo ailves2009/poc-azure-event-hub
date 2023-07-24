@@ -1,30 +1,30 @@
 /************************************************************************************************************************************************
 
-  Azure Synapse Analytics Proof of Concept Architecture: Terraform Template
+  Azure Event Hub Proof of Concept Architecture: Terraform Template
 
-    Create a Synapse Analytics environment based on best practices to achieve a successful proof of concept. While settings can be adjusted, 
+    Create a Event Hub environment based on best practices to achieve a successful proof of concept. While settings can be adjusted, 
     the major deployment differences are based on whether or not you used Private Endpoints for connectivity. If you do not already use 
     Private Endpoints for other Azure deployments, it's discouraged to use them for a proof of concept as they have many other networking 
     depandancies than what can be configured here.
 
     Resources:
 
-      Synapse Analytics Workspace:
-          - DW1000 Dedicated SQL Pool
-          - Pipelines to automatically pause and resume the Dedicated SQL Pool on a schedule
-          - Parquet Auto Ingestion pipeline to help ease and optimize data ingestion using best practices
+      Resource Group:
+          - All of the resources will be created in this Resource Group.
+      
+      Event Hub Namespace:
+          - Container for Event Hubs
 
-      Azure Data Lake Storage Gen2:
-          - Storage for the Synapse Analytics Workspace configuration data
-          - Storage for the data that's going to be queried on-demand or ingested
+      Resource Event Hub:
+          - Highly scalable data streaming platform and event ingestion service that can receive and process millions of events per second in real time
 
-      Log Analytics:
-          - Logging for Synapse Analytics
-          - Logging for Azure Data Lake Storage Gen2
-
+      Resource Access Policy
+          - Shared Access Policy to access to Event Hub
+          
 ************************************************************************************************************************************************/
 
 terraform {
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -92,7 +92,7 @@ resource "azurerm_eventhub_namespace" "eventhub-namespace" {
 
 /************************************************************************************************************************************************
   Resource Event Hub
-        Event Hub 1
+        Highly scalable data streaming platform and event ingestion service that can receive and process millions of events per second in real time
 ************************************************************************************************************************************************/
 resource "azurerm_eventhub" "eventhub-poc1" {
   name                = "eventhub1-poc"
