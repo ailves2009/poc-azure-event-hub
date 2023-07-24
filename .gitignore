@@ -9,6 +9,7 @@ cfn/
 
 # Python files
 *.py
+**/locals/*
 
 # Local .terraform directories
 **/.terraform/*
