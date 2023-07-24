@@ -1,6 +1,6 @@
 # Azure Event Hub PoC
 
-![alt tag](https://github.com/iag2009/Azure-Event-Hub-PoC/tree/master/Images/Azure_Event_Hub_common.png)
+![alt tag](https://github.com/iag2009/Azure-Event-Hub-PoC/tree/master/Images/Azure_Event_Hub.gif)
 
 # Description
 
