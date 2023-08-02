@@ -24,28 +24,6 @@
           - use resource "random_string"
 ************************************************************************************************************************************************/
 
-terraform {
-
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 2.79.0"
-    }
-    azuread = {
-      source  = "hashicorp/azuread"
-      version = "~> 2.5.0"
-    }
-  }
-}
-
-provider "azurerm" {
-  features {}
-}
-
-provider "azuread" {
-  use_msi = false
-}
-
 data "azurerm_client_config" "current" {}
 
 // Add a random suffix to ensure global uniqueness among the resources created
