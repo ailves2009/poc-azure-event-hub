@@ -20,10 +20,13 @@ steps:
     pip install -r requirements.txt
   displayName: 'Install Python dependencies'
 
-# Установка Terraform
-- task: TerraformInstaller@0
-  inputs:
-    terraformVersion: '1.4.6' # Укажите нужную версию Terraform
+# Установка Terraform вручную
+- script: |
+    curl -o terraform.zip https://releases.hashicorp.com/terraform/1.4.6/terraform_1.4.6_linux_amd64.zip
+    unzip terraform.zip
+    sudo mv terraform /usr/local/bin/
+    terraform -version
+  displayName: 'Install Terraform'
 
 # Инициализация Terraform
 - script: |
