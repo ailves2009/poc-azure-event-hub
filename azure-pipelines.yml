@@ -1,3 +1,6 @@
+# az pipelines list --project Azure-Event-Hub-PoC
+# az pipelines run --name iag2009.Azure-Event-Hub-PoC --project Azure-Event-Hub-PoC
+# az pipelines runs list --project Azure-Event-Hub-PoC Status
 trigger:
 - master
 
@@ -21,24 +24,25 @@ steps:
   displayName: 'Install Python dependencies'
 
 # Установка Terraform вручную
-- script: |
-    curl -o terraform.zip https://releases.hashicorp.com/terraform/1.4.6/terraform_1.4.6_linux_amd64.zip
-    unzip terraform.zip
-    sudo mv terraform /usr/local/bin/
-    terraform -version
-  displayName: 'Install Terraform'
+#- script: |
+#    curl -o terraform.zip https://releases.hashicorp.com/terraform/1.4.6/terraform_1.4.6_linux_amd64.zip
+#    unzip terraform.zip
+#    sudo mv terraform /usr/local/bin/
+#    terraform -version
+#  displayName: 'Install Terraform'
 
 # Инициализация Terraform
-- script: |
-    terraform -chdir=$(terraformWorkingDirectory) init
-  displayName: 'Terraform Init'
+#- script: |
+#    terraform -chdir=$(terraformWorkingDirectory) init
+#  displayName: 'Terraform Init'
 
 # Планирование Terraform
-- script: |
-    terraform -chdir=$(terraformWorkingDirectory) plan
-  displayName: 'Terraform Plan'
+#- script: |
+#    terraform -chdir=$(terraformWorkingDirectory) plan
+#  displayName: 'Terraform Plan'
 
 # Применение Terraform
-- script: |
-    terraform -chdir=$(terraformWorkingDirectory) apply -auto-approve
-  displayName: 'Terraform Apply'
+#- script: |
+#    terraform -chdir=$(terraformWorkingDirectory) apply -auto-approve
+#  displayName: 'Terraform Apply'
+  
