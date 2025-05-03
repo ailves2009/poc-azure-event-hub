@@ -1,0 +1,41 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  terraformWorkingDirectory: 'Terraform'
+
+steps:
+# Установка Python
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.x'
+    addToPath: true
+
+# Установка зависимостей Python
+- script: |
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+  displayName: 'Install Python dependencies'
+
+# Установка Terraform
+- task: TerraformInstaller@0
+  inputs:
+    terraformVersion: '1.4.6' # Укажите нужную версию Terraform
+
+# Инициализация Terraform
+- script: |
+    terraform -chdir=$(terraformWorkingDirectory) init
+  displayName: 'Terraform Init'
+
+# Планирование Terraform
+- script: |
+    terraform -chdir=$(terraformWorkingDirectory) plan
+  displayName: 'Terraform Plan'
+
+# Применение Terraform
+- script: |
+    terraform -chdir=$(terraformWorkingDirectory) apply -auto-approve
+  displayName: 'Terraform Apply'
