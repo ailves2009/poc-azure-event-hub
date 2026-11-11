@@ -36,3 +36,6 @@ docs/images/event_hubs_full_pipeline.webp
 
 # Local deploy notes and terminal logs
 .claude/poc-deploy.md
+
+# Local agent skills (not published)
+.claude/skills/eventhub-triage/
