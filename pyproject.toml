@@ -1,0 +1,23 @@
+[project]
+name = "poc-azure-event-hub"
+version = "1.0.0"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 120
+src = ["app"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S", "RUF"]
+ignore = ["S603", "S607"] # health.py calls the az CLI with a fixed argument list
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "S311"]
+"app/core.py" = ["S311"] # demo data, not crypto
+
+[tool.ruff.lint.isort]
+known-first-party = ["config", "core", "guardrails", "plan_facts"]
+
+[tool.pytest.ini_options]
+pythonpath = ["app", "ci", "policy"]
+testpaths = ["tests"]

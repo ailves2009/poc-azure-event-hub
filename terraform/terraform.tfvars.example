@@ -1,0 +1,17 @@
+# Copy to terraform.tfvars (git-ignored) and adjust. Every value has a safe default.
+
+location               = "westeurope"
+owner                  = "your-name"
+throughput_units       = 1
+partition_count        = 4
+message_retention_days = 1
+
+# Lock the namespace to your IP:  curl -s https://ifconfig.me
+# allowed_cidrs = ["203.0.113.10/32"]
+
+# Event Hubs Capture to Blob (Avro). Adds a per-TU hourly charge: see README, Cost.
+# capture_enabled = true
+
+# Alerts and budget notifications
+# alert_email        = "you@example.com"
+monthly_budget_usd = 30

@@ -1,0 +1,161 @@
+# CI for poc-azure-event-hub.
+#
+# Every PR and push:  terraform fmt/validate/tflint -> Checkov -> guardrails + unit tests (pytest) -> ruff
+# PR, when Azure is configured: plan (OIDC, read-only) -> posture facts -> AI plan review (comment only)
+#
+# There is no apply job on purpose: the POC is created and destroyed from a laptop
+# (`make up` / `make down`), so there is no long-lived environment for CI to own.
+#
+# Principle: deterministic tools decide, the model explains. The AI job has no Azure
+# credentials and no write token; a separate job posts its output.
+#
+# Optional repository settings (the plan and AI jobs are skipped without them):
+#   vars:    AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID  (federated credential, Reader role)
+#   secrets: ANTHROPIC_API_KEY
+
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+env:
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "false"
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
+        with:
+          terraform_version: "~1.15"
+      - run: terraform fmt -check -recursive
+      - run: terraform init -backend=false
+      - run: terraform validate
+      - uses: terraform-linters/setup-tflint@90f302c255ef959cbfb4bd10581afecdb7ece3e6 # v4
+      - run: tflint --init && tflint --format compact
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+  checkov:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      - run: pip install checkov==3.4.4
+      # Every skip is inline in the .tf file, with its reason.
+      - run: checkov -d terraform --framework terraform --compact --quiet
+
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.txt
+      - run: ruff check . && ruff format --check .
+      - name: Guardrails (policy as code)
+        run: python policy/guardrails.py terraform
+      - run: pytest -q
+
+  plan:
+    if: github.event_name == 'pull_request' && vars.AZURE_CLIENT_ID != ''
+    needs: [terraform, checkov, python]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # OIDC to Azure, no client secret
+    env:
+      ARM_USE_OIDC: "true"
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      # Reader cannot register resource providers; registration is a one-time `make up` concern.
+      ARM_RESOURCE_PROVIDER_REGISTRATIONS: none
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
+        with:
+          terraform_version: "~1.15"
+          terraform_wrapper: false
+      - name: Plan against empty state (= what `make up` creates)
+        working-directory: terraform
+        run: |
+          terraform init -backend=false
+          terraform plan -lock=false -out=tfplan
+          terraform show -json tfplan > ../plan.json
+      - run: python3 ci/plan_facts.py plan.json > facts.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: plan-review
+          path: |
+            plan.json
+            facts.json
+
+  ai-review:
+    needs: plan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          sparse-checkout: ci
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: plan-review
+          path: review
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+      - name: Claude Code plan review (read-only)
+        working-directory: review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          npx --yes @anthropic-ai/claude-code@2.1.316 -p "$(cat ../ci/ai-review-prompt.md)" \
+            --model claude-sonnet-5-5 \
+            --allowedTools "Read" \
+            --disallowedTools "Bash" "Edit" "Write" "WebFetch" "WebSearch" \
+            --max-turns 10 \
+            --output-format text > ai-review.md
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ai-review
+          path: review/ai-review.md
+
+  comment:
+    needs: ai-review
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: ai-review
+      - uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        with:
+          script: |
+            const fs = require('fs');
+            const marker = '<!-- ai-plan-review -->';
+            const body = `${marker}\n## AI plan review\n\n${fs.readFileSync('ai-review.md', 'utf8')}\n\n` +
+              `_AI-generated from plan.json and facts.json. Advisory only: ` +
+              `guardrails, Checkov and the human reviewer decide._`;
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number });
+            const prev = comments.find(c => c.body.startsWith(marker));
+            if (prev) await github.rest.issues.updateComment({ owner, repo, comment_id: prev.id, body });
+            else await github.rest.issues.createComment({ owner, repo, issue_number, body });
