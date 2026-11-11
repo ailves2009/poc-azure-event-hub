@@ -14,4 +14,4 @@
 | Overview / Pricing | Basic for $11/month | Basic lacks consumer groups, Kafka, IP filtering and Capture. Standard (~$22/month per TU) is the realistic minimum. The pipeline's largest cost, Stream Analytics (~$80/month per streaming unit, 24/7), was not counted |
 | Logging, Monitoring | Capture "transforms and analyses telemetry in real time" | Capture is a batch archive to Blob or Data Lake (Avro, or Parquet via Stream Analytics) on a time/size window. Real-time processing is done by consumers or Stream Analytics. Capture also requires Standard or higher |
 | Advanced Deployment | `sku = "Basic"`, SAS rule, `deployEventHub.sh` | See [CHANGES.md](../CHANGES.md): Standard, Entra ID only, Makefile with a saved plan |
-| Thank you | Former employer and corporate email | Outdated contact details; not to be used |
+| Overview, Advanced Deployment | `git clone https://github.com/iag2009/Azure-Event-Hub-PoC.git`, `bash deployEventHub.sh` | The repository moved to `https://github.com/ailves2009/poc-azure-event-hub`; deploy with `make plan` and `make up` |

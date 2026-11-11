@@ -13,6 +13,11 @@ The rest of the series asks it for compute
 [poc-fargate](https://github.com/ailves2009/poc-fargate)); this one asks it for the data plane,
 on a second cloud.
 
+> **Status: validated offline, not deployed.** `terraform validate`, tflint, Checkov, the guardrails
+> and the unit tests pass in CI. The environment has not been applied to Azure, so runtime behaviour
+> (RBAC propagation, diagnostic categories, Kafka OAuth, metrics queries) is unverified, and every
+> cost figure below is a list-price estimate.
+
 ![Event Hubs: producers, partitions, consumer groups](docs/images/azure-event-hub.gif)
 
 ## The decision in one page
