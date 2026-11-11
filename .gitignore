@@ -33,3 +33,6 @@ docs/images/event_hubs_full_pipeline.webp
 .idea/
 .vscode/settings.json
 *.code-workspace
+
+# Local deploy notes and terminal logs
+.claude/poc-deploy.md
